@@ -3,10 +3,44 @@
     <VoteHeader :user="user" />
 
     <div class="vote-content" v-if="session">
-      <div class="session-info">
-        <h2>{{ session.title }}</h2>
-        <p>{{ session.description }}</p>
-        <p class="vote-rule">请选择 {{ session.minVotes }}-{{ session.maxVotes }} 位候选人</p>
+      <div class="session-info"></div>
+
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content">
+            <span class="timeline-date">11.20</span>
+            <span class="timeline-title">推荐</span>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content">
+            <span class="timeline-date">12.01</span>
+            <span class="timeline-title">专家会审视</span>
+          </div>
+        </div>
+        <div class="timeline-item active">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content">
+            <span class="timeline-date">12.10</span>
+            <span class="timeline-title">大众投票</span>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content">
+            <span class="timeline-date">12.20</span>
+            <span class="timeline-title">专评会评选</span>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content">
+            <span class="timeline-date">12.30</span>
+            <span class="timeline-title">结果公示</span>
+          </div>
+        </div>
       </div>
 
       <div class="vote-status" v-if="hasVoted">
@@ -15,6 +49,7 @@
 
       <div class="selected-info" v-else>
         <span>已选择: {{ selectedIds.length }} / {{ session.minVotes }}-{{ session.maxVotes }}</span>
+        <span class="vote-rule-text">投票规则：每人可投5-10票</span>
       </div>
 
       <div class="candidates-grid">
@@ -74,6 +109,11 @@ const toggleCandidate = (id) => {
   if (index > -1) {
     selectedIds.value.splice(index, 1)
   } else {
+    // Check if max votes reached
+    if (session.value && selectedIds.value.length >= session.value.maxVotes) {
+      alert(`最多只能选择 ${session.value.maxVotes} 位候选人`)
+      return
+    }
     selectedIds.value.push(id)
   }
 }
@@ -92,7 +132,6 @@ const submitVote = async () => {
 <style scoped>
 .vote-page {
   min-height: 100vh;
-  background: #f5f5f5;
 }
 
 .vote-content {
@@ -102,8 +141,10 @@ const submitVote = async () => {
 }
 
 .session-info {
-  background: white;
-  padding: 24px;
+  background: url('/background.png') no-repeat center center;
+  background-size: 100% 100%;
+  height: 120px;
+  padding: 0;
   border-radius: 8px;
   margin-bottom: 24px;
 }
@@ -123,12 +164,87 @@ const submitVote = async () => {
   font-weight: 500;
 }
 
-.selected-info {
+.timeline {
+  display: flex;
+  justify-content: space-between;
+  background: white;
+  padding: 24px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  position: relative;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 24px;
+  right: 24px;
+  height: 2px;
+  background: #e8e8e8;
+  transform: translateY(-50%);
+  z-index: 0;
+}
+
+.timeline-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+  flex: 1;
+}
+
+.timeline-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #d9d9d9;
+  margin-bottom: 8px;
+}
+
+.timeline-item.active .timeline-dot {
+  background: #1890ff;
+  box-shadow: 0 0 0 4px rgba(24, 144, 255, 0.2);
+}
+
+.timeline-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
-  padding: 12px;
+}
+
+.timeline-date {
+  font-size: 18px;
+  color: #ff0000;
+  margin-bottom: 4px;
+}
+
+.timeline-title {
+  font-size: 18px;
+  color: #ff0000;
+  font-weight: 500;
+}
+
+.timeline-item.active .timeline-date,
+.timeline-item.active .timeline-title {
+  color: #ff0000;
+}
+
+.selected-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 24px;
   background: white;
   border-radius: 8px;
   margin-bottom: 24px;
+  font-weight: 500;
+}
+
+.vote-rule-text {
+  color: #1890ff;
   font-weight: 500;
 }
 
@@ -143,7 +259,7 @@ const submitVote = async () => {
 
 .candidates-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 16px;
   margin-bottom: 24px;
 }

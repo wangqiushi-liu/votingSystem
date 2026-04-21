@@ -1,10 +1,45 @@
 import axios from 'axios'
 
+// Convert snake_case to camelCase
+const toCamelCase = (obj) => {
+  if (Array.isArray(obj)) {
+    return obj.map(toCamelCase)
+  } else if (obj !== null && typeof obj === 'object') {
+    return Object.keys(obj).reduce((acc, key) => {
+      const camelKey = key.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase())
+      acc[camelKey] = toCamelCase(obj[key])
+      return acc
+    }, {})
+  }
+  return obj
+}
+
+// Convert camelCase to snake_case
+const toSnakeCase = (obj) => {
+  if (Array.isArray(obj)) {
+    return obj.map(toSnakeCase)
+  } else if (obj !== null && typeof obj === 'object') {
+    return Object.keys(obj).reduce((acc, key) => {
+      const snakeKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`)
+      acc[snakeKey] = toSnakeCase(obj[key])
+      return acc
+    }, {})
+  }
+  return obj
+}
+
 const apiClient = axios.create({
   baseURL: '/api',
   headers: {
     'Content-Type': 'application/json'
-  }
+  },
+  transformRequest: [(data) => {
+    return JSON.stringify(toSnakeCase(data))
+  }],
+  transformResponse: [(data) => {
+    const parsed = JSON.parse(data)
+    return toCamelCase(parsed)
+  }]
 })
 
 // 请求拦截器

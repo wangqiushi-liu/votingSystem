@@ -21,7 +21,7 @@ public class VoteService {
     private final UserRepository userRepository;
 
     public VoteSession getActiveSession() {
-        return voteSessionRepository.findFirstByStatusOrderByCreatedAtDesc(SessionStatus.ACTIVE)
+        return voteSessionRepository.findFirstByStatusOrderByCreatedAtDesc(VoteSession.SessionStatus.ACTIVE)
                 .orElse(null);
     }
 

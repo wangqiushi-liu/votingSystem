@@ -16,16 +16,22 @@ const userStore = useUserStore()
 const router = useRouter()
 
 const handleLogin = async () => {
-  // 模拟登录 - 实际应该跳转 Welink OAuth
-  const mockCode = 'mock-user-' + Date.now()
-  const success = await userStore.login(mockCode)
-  if (success) {
-    const user = userStore.user
-    if (user.role === 'ADMIN') {
-      router.push('/admin')
+  try {
+    // 模拟登录 - 实际应该跳转 Welink OAuth
+    const mockCode = 'mock-user-' + Date.now()
+    const success = await userStore.login(mockCode)
+    if (success) {
+      const user = userStore.user
+      if (user.role === 'ADMIN') {
+        router.push('/admin')
+      } else {
+        router.push('/vote')
+      }
     } else {
-      router.push('/vote')
+      alert('登录失败，请确保后端服务已启动')
     }
+  } catch (error) {
+    alert('无法连接到服务器，请确保后端服务已启动')
   }
 }
 </script>
