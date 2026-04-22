@@ -32,14 +32,7 @@ const apiClient = axios.create({
   baseURL: '/api',
   headers: {
     'Content-Type': 'application/json'
-  },
-  transformRequest: [(data) => {
-    return JSON.stringify(toSnakeCase(data))
-  }],
-  transformResponse: [(data) => {
-    const parsed = JSON.parse(data)
-    return toCamelCase(parsed)
-  }]
+  }
 })
 
 // 请求拦截器
